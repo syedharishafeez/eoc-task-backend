@@ -142,9 +142,41 @@ app.get("/fetch-roles", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res
-    .status(200)
-    .json({ body: { message: "Login Successful" }, statusCode: 200 });
+  try {
+    const { userName, userPassword } = req.body;
+    let buff = new Buffer(userPassword);
+    let base64Password = buff.toString("base64");
+    let sql = `SELECT * FROM EMPLOYEES WHERE EMPLOYEE_USERNAME = "${userName}" AND EMPLOYEE_PASSWORD = "${base64Password}"`;
+    connection.query(sql, function (err, fetchEmployee) {
+      if (err) {
+        res.status(400).json({
+          body: { message: "Please Contact Administrator" },
+          statusCode: 400,
+        });
+      } else {
+        if (fetchEmployee.length > 0) {
+          delete fetchEmployee[0].EMPLOYEE_PASSWORD;
+          res.status(200).json({
+            body: {
+              message: "Login Successful",
+              data: fetchEmployee ? fetchEmployee[0] : [],
+            },
+            statusCode: 200,
+          });
+        } else {
+          res.status(400).json({
+            body: { message: "Invalid Credentials" },
+            statusCode: 400,
+          });
+        }
+      }
+    });
+  } catch (ex) {
+    res.status(400).json({
+      body: { message: "Please Contact Administrator" },
+      statusCode: 400,
+    });
+  }
 });
 
 app.post("/register", (req, res) => {
@@ -207,12 +239,6 @@ app.post("/register", (req, res) => {
       statusCode: 400,
     });
   }
-});
-
-app.post("/employee-detail", (req, res) => {
-  setTimeout(() => {
-    res.status(200).json({ body: { ...data }, statusCode: 200 });
-  }, 1000);
 });
 
 app.listen(4000, () => console.log("app is listening at 4000"));
