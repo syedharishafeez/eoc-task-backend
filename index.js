@@ -27,7 +27,7 @@ try {
 
         let createEmployeesTable = `create table if not exists EMPLOYEES(
                           EMPLOYEE_ID int primary key auto_increment,
-                          EMPLOYEE_USERNAME varchar(255) not null,
+                          EMPLOYEE_USERNAME varchar(255) UNIQUE not null,
                           EMPLOYEE_PASSWORD varchar(255) not null,
                           EMPLOYEE_DEPARTMENT varchar(255) not null,
                           EMPLOYEE_AGE varchar(255) not null,
@@ -49,21 +49,7 @@ try {
           }
         });
 
-        connection.query(createEmployeeRoleJunctionTable, function (
-          err,
-          result
-        ) {
-          if (err) {
-            console.log("err = ", err);
-            throw err.message;
-          }
-        });
-
-        return connection.query(createRolesTable, function (
-          err,
-          results,
-          fields
-        ) {
+        connection.query(createRolesTable, function (err, results, fields) {
           if (err) {
             console.log("err = ", err);
             return null;
@@ -81,6 +67,15 @@ try {
                 console.log("insert Result = ", insertResult);
               }
             });
+          }
+        });
+        connection.query(createEmployeeRoleJunctionTable, function (
+          err,
+          result
+        ) {
+          if (err) {
+            console.log("err = ", err);
+            throw err.message;
           }
         });
       }
