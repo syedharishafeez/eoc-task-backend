@@ -146,20 +146,25 @@ app.post("/login", (req, res) => {
     const { userName, userPassword } = req.body;
     let buff = new Buffer(userPassword);
     let base64Password = buff.toString("base64");
-    let sql = `SELECT * FROM EMPLOYEES WHERE EMPLOYEE_USERNAME = "${userName}" AND EMPLOYEE_PASSWORD = "${base64Password}"`;
+    let sql = `SELECT * FROM EMPLOYEES INNER JOIN EMPLOYEE_ROLE ON EMPLOYEES.EMPLOYEE_ID = EMPLOYEE_ROLE.EMPLOYEE_ID
+INNER JOIN ROLES ON EMPLOYEE_ROLE.ROLE_ID = ROLES.ROLE_ID WHERE EMPLOYEE_USERNAME = "${userName}" AND EMPLOYEE_PASSWORD = "${base64Password}"`;
     connection.query(sql, function (err, fetchEmployee) {
       if (err) {
+        console.log("err = ", err);
+
         res.status(400).json({
           body: { message: "Please Contact Administrator" },
           statusCode: 400,
         });
       } else {
+        console.log("fetchEmployee = ", fetchEmployee);
+
         if (fetchEmployee.length > 0) {
           delete fetchEmployee[0].EMPLOYEE_PASSWORD;
           res.status(200).json({
             body: {
               message: "Login Successful",
-              data: fetchEmployee ? fetchEmployee[0] : [],
+              data: fetchEmployee ? fetchEmployee : [],
             },
             statusCode: 200,
           });
@@ -172,6 +177,8 @@ app.post("/login", (req, res) => {
       }
     });
   } catch (ex) {
+    console.log("ex = ", ex);
+
     res.status(400).json({
       body: { message: "Please Contact Administrator" },
       statusCode: 400,
