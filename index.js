@@ -63,7 +63,7 @@ try {
             ) {
               if (err) {
               } else {
-                if (fetchingRolesResult.length < 4) {
+                if (fetchingRolesResult.length === 0) {
                   let sql = `INSERT INTO ROLES(ROLE_NAME,ROLE_DESCRIPTION)
              VALUES('role1',"This is role1"), ('role2',"This is role2"), ('role3',"This is role3"), ('role4',"This is role4")`;
 
